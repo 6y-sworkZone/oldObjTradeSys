@@ -167,14 +167,14 @@ func insertSampleData() {
 	}
 
 	products := []Product{
-		{Name: "iPhone 13 Pro", Description: "95新，无划痕，电池健康92%", Price: 4599, Stock: 5, ImageURL: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=iPhone%2013%20Pro%20smartphone%20on%20white%20background&image_size=square", IsPromo: true, SellerID: 1},
-		{Name: "MacBook Air M2", Description: "几乎全新，使用不到3个月", Price: 7999, Stock: 2, ImageURL: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=MacBook%20Air%20laptop%20silver%20color&image_size=square", IsPromo: false, SellerID: 1},
-		{Name: "Sony WH-1000XM4", Description: "降噪耳机，音质极佳", Price: 1299, Stock: 0, ImageURL: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Sony%20headphones%20black%20color%20wireless&image_size=square", IsPromo: true, SellerID: 1},
-		{Name: "iPad Pro 11寸", Description: "2022款，带Apple Pencil", Price: 5299, Stock: 3, ImageURL: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=iPad%20Pro%20tablet%20with%20pencil&image_size=square", IsPromo: false, SellerID: 1},
-		{Name: "Nintendo Switch OLED", Description: "港版，带游戏卡带", Price: 1999, Stock: 8, ImageURL: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Nintendo%20Switch%20gaming%20console&image_size=square", IsPromo: true, SellerID: 1},
-		{Name: "AirPods Pro 2", Description: "正品，包装齐全", Price: 1499, Stock: 10, ImageURL: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AirPods%20Pro%20wireless%20earbuds&image_size=square", IsPromo: false, SellerID: 1},
-		{Name: "Dell 27寸显示器", Description: "4K分辨率，IPS面板", Price: 1899, Stock: 4, ImageURL: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Dell%20computer%20monitor%2027%20inch&image_size=square", IsPromo: false, SellerID: 1},
-		{Name: "机械键盘 Filco", Description: "茶轴，手感一流", Price: 899, Stock: 6, ImageURL: "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mechanical%20keyboard%20gaming%20RGB&image_size=square", IsPromo: true, SellerID: 1},
+		{Name: "iPhone 13 Pro", Description: "95新，无划痕，电池健康92%", Price: 4599, Stock: 5, ImageURL: "https://picsum.photos/seed/iphone13/400/300", IsPromo: true, SellerID: 1},
+		{Name: "MacBook Air M2", Description: "几乎全新，使用不到3个月", Price: 7999, Stock: 2, ImageURL: "https://picsum.photos/seed/macbook/400/300", IsPromo: false, SellerID: 1},
+		{Name: "Sony WH-1000XM4", Description: "降噪耳机，音质极佳", Price: 1299, Stock: 0, ImageURL: "https://picsum.photos/seed/headphones/400/300", IsPromo: true, SellerID: 1},
+		{Name: "iPad Pro 11寸", Description: "2022款，带Apple Pencil", Price: 5299, Stock: 3, ImageURL: "https://picsum.photos/seed/ipad/400/300", IsPromo: false, SellerID: 1},
+		{Name: "Nintendo Switch OLED", Description: "港版，带游戏卡带", Price: 1999, Stock: 8, ImageURL: "https://picsum.photos/seed/switch/400/300", IsPromo: true, SellerID: 1},
+		{Name: "AirPods Pro 2", Description: "正品，包装齐全", Price: 1499, Stock: 10, ImageURL: "https://picsum.photos/seed/airpods/400/300", IsPromo: false, SellerID: 1},
+		{Name: "Dell 27寸显示器", Description: "4K分辨率，IPS面板", Price: 1899, Stock: 4, ImageURL: "https://picsum.photos/seed/monitor/400/300", IsPromo: false, SellerID: 1},
+		{Name: "机械键盘 Filco", Description: "茶轴，手感一流", Price: 899, Stock: 6, ImageURL: "https://picsum.photos/seed/keyboard/400/300", IsPromo: true, SellerID: 1},
 	}
 
 	for _, p := range products {
