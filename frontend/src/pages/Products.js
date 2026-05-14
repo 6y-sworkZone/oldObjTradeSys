@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 
 function Products() {
@@ -7,14 +8,18 @@ function Products() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('全部');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState('desc');
   const [toast, setToast] = useState(null);
   const { token } = useAuth();
+  const navigate = useNavigate();
+
+  const categories = ['全部', '电子产品', '家居用品', '图书', '运动户外', '服装', '其他'];
 
   useEffect(() => {
     fetchProducts();
-  }, [page, sortBy, sortOrder]);
+  }, [page, sortBy, sortOrder, category]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -33,7 +38,8 @@ function Products() {
         limit: 8,
         sort: sortBy,
         order: sortOrder,
-        ...(search && { search })
+        ...(search && { search }),
+        ...(category !== '全部' && { category })
       });
 
       const response = await fetch(`/api/products?${params}`, {
@@ -49,7 +55,8 @@ function Products() {
     }
   };
 
-  const handleOrder = async (productId) => {
+  const handleOrder = async (productId, e) => {
+    e.stopPropagation();
     try {
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -98,6 +105,18 @@ function Products() {
         />
         <select
           className="select-input"
+          value={category}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            setPage(1);
+          }}
+        >
+          {categories.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
+        <select
+          className="select-input"
           value={sortBy}
           onChange={(e) => {
             setSortBy(e.target.value);
@@ -129,16 +148,36 @@ function Products() {
         <>
           <div className="product-grid">
             {products.map((product) => (
-              <div key={product.id} className="card product-card">
+              <div
+                key={product.id}
+                className="card product-card"
+                style={{ cursor: 'pointer' }}
+                onClick={() => navigate(`/products/${product.id}`)}
+              >
                 {product.is_promo && (
                   <div className="product-promo">🔥 促销中</div>
                 )}
+                {product.category && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    padding: '4px 10px',
+                    borderRadius: '12px',
+                    fontSize: '11px',
+                    fontWeight: 'bold'
+                  }}>
+                    {product.category}
+                  </div>
+                )}
                 <img
-                  src={product.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}
+                  src={product.image_url || 'https://picsum.photos/seed/placeholder/300/200'}
                   alt={product.name}
                   className="product-image"
                   onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                    e.target.src = 'https://picsum.photos/seed/placeholder/300/200';
                   }}
                 />
                 <div className="product-info">
@@ -152,7 +191,7 @@ function Products() {
                     className="btn btn-success"
                     style={{ width: '100%' }}
                     disabled={product.stock === 0}
-                    onClick={() => handleOrder(product.id)}
+                    onClick={(e) => handleOrder(product.id, e)}
                   >
                     {product.stock === 0 ? '暂无库存' : '立即购买'}
                   </button>

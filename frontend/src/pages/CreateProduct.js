@@ -3,13 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 
 function CreateProduct() {
+  const categories = ['电子产品', '家居用品', '图书', '运动户外', '服装', '其他'];
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     stock: '',
     image_url: '',
-    is_promo: false
+    is_promo: false,
+    category: '电子产品'
   });
   const [error, setError] = useState('');
   const { token } = useAuth();
@@ -110,6 +113,21 @@ function CreateProduct() {
               min="0"
               placeholder="请输入库存数量"
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">商品分类</label>
+            <select
+              name="category"
+              className="form-input"
+              value={formData.category}
+              onChange={handleChange}
+              required
+            >
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">

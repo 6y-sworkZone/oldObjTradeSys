@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-ro
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Products from './pages/Products';
+import ProductDetail from './pages/ProductDetail';
 import CreateProduct from './pages/CreateProduct';
 import Orders from './pages/Orders';
 import Home from './pages/Home';
@@ -82,6 +83,7 @@ function App() {
             <Route path="/login" element={user ? <Navigate to="/products" /> : <Login />} />
             <Route path="/register" element={user ? <Navigate to="/products" /> : <Register />} />
             <Route path="/products" element={user ? <Products /> : <Navigate to="/login" />} />
+            <Route path="/products/:id" element={user ? <ProductDetail /> : <Navigate to="/login" />} />
             <Route path="/create-product" element={
               user && user.role === 'seller' ? <CreateProduct /> : <Navigate to="/login" />
             } />

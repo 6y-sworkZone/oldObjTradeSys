@@ -35,11 +35,17 @@ type Product struct {
 	Stock       int       `json:"stock"`
 	ImageURL    string    `json:"image_url"`
 	IsPromo     bool      `json:"is_promo"`
+	Category    string    `json:"category"`
 	SellerID    int       `json:"seller_id"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-type Order struct {
+type ProductWithSeller struct {
+	Product
+	SellerName string `json:"seller_name"`
+}
+
+type OrderWithProduct struct {
 	ID         int       `json:"id"`
 	BuyerID    int       `json:"buyer_id"`
 	ProductID  int       `json:"product_id"`
@@ -47,6 +53,9 @@ type Order struct {
 	TotalPrice float64   `json:"total_price"`
 	Status     string    `json:"status"`
 	CreatedAt  time.Time `json:"created_at"`
+	ProductName string   `json:"product_name"`
+	ProductImage string  `json:"product_image"`
+	ProductCategory string `json:"product_category"`
 }
 
 type Claims struct {
@@ -108,6 +117,10 @@ func initDB() {
 }
 
 func createTables() {
+	db.Exec(`DROP TABLE IF EXISTS orders`)
+	db.Exec(`DROP TABLE IF EXISTS products`)
+	db.Exec(`DROP TABLE IF EXISTS users`)
+
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS users (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -123,6 +136,7 @@ func createTables() {
 			stock INTEGER NOT NULL DEFAULT 0,
 			image_url TEXT,
 			is_promo INTEGER NOT NULL DEFAULT 0,
+			category TEXT NOT NULL DEFAULT '其他',
 			seller_id INTEGER NOT NULL,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (seller_id) REFERENCES users(id)
@@ -167,19 +181,19 @@ func insertSampleData() {
 	}
 
 	products := []Product{
-		{Name: "iPhone 13 Pro", Description: "95新，无划痕，电池健康92%", Price: 4599, Stock: 5, ImageURL: "https://picsum.photos/seed/iphone13/400/300", IsPromo: true, SellerID: 1},
-		{Name: "MacBook Air M2", Description: "几乎全新，使用不到3个月", Price: 7999, Stock: 2, ImageURL: "https://picsum.photos/seed/macbook/400/300", IsPromo: false, SellerID: 1},
-		{Name: "Sony WH-1000XM4", Description: "降噪耳机，音质极佳", Price: 1299, Stock: 0, ImageURL: "https://picsum.photos/seed/headphones/400/300", IsPromo: true, SellerID: 1},
-		{Name: "iPad Pro 11寸", Description: "2022款，带Apple Pencil", Price: 5299, Stock: 3, ImageURL: "https://picsum.photos/seed/ipad/400/300", IsPromo: false, SellerID: 1},
-		{Name: "Nintendo Switch OLED", Description: "港版，带游戏卡带", Price: 1999, Stock: 8, ImageURL: "https://picsum.photos/seed/switch/400/300", IsPromo: true, SellerID: 1},
-		{Name: "AirPods Pro 2", Description: "正品，包装齐全", Price: 1499, Stock: 10, ImageURL: "https://picsum.photos/seed/airpods/400/300", IsPromo: false, SellerID: 1},
-		{Name: "Dell 27寸显示器", Description: "4K分辨率，IPS面板", Price: 1899, Stock: 4, ImageURL: "https://picsum.photos/seed/monitor/400/300", IsPromo: false, SellerID: 1},
-		{Name: "机械键盘 Filco", Description: "茶轴，手感一流", Price: 899, Stock: 6, ImageURL: "https://picsum.photos/seed/keyboard/400/300", IsPromo: true, SellerID: 1},
+		{Name: "iPhone 13 Pro", Description: "95新，无划痕，电池健康92%", Price: 4599, Stock: 5, ImageURL: "https://picsum.photos/seed/iphone13/400/300", IsPromo: true, Category: "电子产品", SellerID: 1},
+		{Name: "MacBook Air M2", Description: "几乎全新，使用不到3个月", Price: 7999, Stock: 2, ImageURL: "https://picsum.photos/seed/macbook/400/300", IsPromo: false, Category: "电子产品", SellerID: 1},
+		{Name: "Sony WH-1000XM4", Description: "降噪耳机，音质极佳", Price: 1299, Stock: 0, ImageURL: "https://picsum.photos/seed/headphones/400/300", IsPromo: true, Category: "电子产品", SellerID: 1},
+		{Name: "iPad Pro 11寸", Description: "2022款，带Apple Pencil", Price: 5299, Stock: 3, ImageURL: "https://picsum.photos/seed/ipad/400/300", IsPromo: false, Category: "电子产品", SellerID: 1},
+		{Name: "Nintendo Switch OLED", Description: "港版，带游戏卡带", Price: 1999, Stock: 8, ImageURL: "https://picsum.photos/seed/switch/400/300", IsPromo: true, Category: "运动户外", SellerID: 1},
+		{Name: "AirPods Pro 2", Description: "正品，包装齐全", Price: 1499, Stock: 10, ImageURL: "https://picsum.photos/seed/airpods/400/300", IsPromo: false, Category: "电子产品", SellerID: 1},
+		{Name: "Dell 27寸显示器", Description: "4K分辨率，IPS面板", Price: 1899, Stock: 4, ImageURL: "https://picsum.photos/seed/monitor/400/300", IsPromo: false, Category: "电子产品", SellerID: 1},
+		{Name: "机械键盘 Filco", Description: "茶轴，手感一流", Price: 899, Stock: 6, ImageURL: "https://picsum.photos/seed/keyboard/400/300", IsPromo: true, Category: "电子产品", SellerID: 1},
 	}
 
 	for _, p := range products {
-		_, err := db.Exec(`INSERT INTO products (name, description, price, stock, image_url, is_promo, seller_id) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-			p.Name, p.Description, p.Price, p.Stock, p.ImageURL, p.IsPromo, p.SellerID)
+		_, err := db.Exec(`INSERT INTO products (name, description, price, stock, image_url, is_promo, category, seller_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+			p.Name, p.Description, p.Price, p.Stock, p.ImageURL, p.IsPromo, p.Category, p.SellerID)
 		if err != nil {
 			log.Println(err)
 		}
@@ -304,17 +318,23 @@ func getProducts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "8"))
 	search := c.Query("search")
+	category := c.Query("category")
 	sortBy := c.DefaultQuery("sort", "created_at")
 	sortOrder := c.DefaultQuery("order", "desc")
 
 	offset := (page - 1) * limit
 
-	query := `SELECT id, name, description, price, stock, image_url, is_promo, seller_id, created_at FROM products WHERE 1=1`
+	query := `SELECT id, name, description, price, stock, image_url, is_promo, category, seller_id, created_at FROM products WHERE 1=1`
 	args := []interface{}{}
 
 	if search != "" {
 		query += " AND (name LIKE ? OR description LIKE ?)"
 		args = append(args, "%"+search+"%", "%"+search+"%")
+	}
+
+	if category != "" && category != "全部" {
+		query += " AND category = ?"
+		args = append(args, category)
 	}
 
 	validSortColumns := map[string]bool{"price": true, "created_at": true, "stock": true}
@@ -339,7 +359,7 @@ func getProducts(c *gin.Context) {
 	for rows.Next() {
 		var p Product
 		var createdAtStr string
-		err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Stock, &p.ImageURL, &p.IsPromo, &p.SellerID, &createdAtStr)
+		err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Stock, &p.ImageURL, &p.IsPromo, &p.Category, &p.SellerID, &createdAtStr)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -353,6 +373,10 @@ func getProducts(c *gin.Context) {
 	if search != "" {
 		countQuery += " AND (name LIKE ? OR description LIKE ?)"
 		countArgs = append(countArgs, "%"+search+"%", "%"+search+"%")
+	}
+	if category != "" && category != "全部" {
+		countQuery += " AND category = ?"
+		countArgs = append(countArgs, category)
 	}
 
 	var total int
@@ -369,10 +393,14 @@ func getProducts(c *gin.Context) {
 
 func getProduct(c *gin.Context) {
 	id := c.Param("id")
-	var p Product
+	var p ProductWithSeller
 	var createdAtStr string
-	err := db.QueryRow(`SELECT id, name, description, price, stock, image_url, is_promo, seller_id, created_at FROM products WHERE id = ?`, id).
-		Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Stock, &p.ImageURL, &p.IsPromo, &p.SellerID, &createdAtStr)
+	err := db.QueryRow(`
+		SELECT p.id, p.name, p.description, p.price, p.stock, p.image_url, p.is_promo, p.category, p.seller_id, p.created_at, u.username 
+		FROM products p 
+		JOIN users u ON p.seller_id = u.id 
+		WHERE p.id = ?`, id).
+		Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Stock, &p.ImageURL, &p.IsPromo, &p.Category, &p.SellerID, &createdAtStr, &p.SellerName)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "商品不存在"})
 		return
@@ -395,8 +423,8 @@ func createProduct(c *gin.Context) {
 	}
 
 	sellerID := c.GetInt("user_id")
-	result, err := db.Exec(`INSERT INTO products (name, description, price, stock, image_url, is_promo, seller_id) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		product.Name, product.Description, product.Price, product.Stock, product.ImageURL, product.IsPromo, sellerID)
+	result, err := db.Exec(`INSERT INTO products (name, description, price, stock, image_url, is_promo, category, seller_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		product.Name, product.Description, product.Price, product.Stock, product.ImageURL, product.IsPromo, product.Category, sellerID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -471,16 +499,18 @@ func getOrders(c *gin.Context) {
 	var query string
 	var args []interface{}
 
+	query = `SELECT o.id, o.buyer_id, o.product_id, o.quantity, o.total_price, o.status, o.created_at, p.name, p.image_url, p.category
+	         FROM orders o JOIN products p ON o.product_id = p.id 
+	         WHERE `
+
 	if role == "seller" {
-		query = `SELECT o.id, o.buyer_id, o.product_id, o.quantity, o.total_price, o.status, o.created_at 
-		         FROM orders o JOIN products p ON o.product_id = p.id 
-		         WHERE p.seller_id = ? ORDER BY o.created_at DESC`
+		query += `p.seller_id = ?`
 		args = append(args, userID)
 	} else {
-		query = `SELECT id, buyer_id, product_id, quantity, total_price, status, created_at 
-		         FROM orders WHERE buyer_id = ? ORDER BY created_at DESC`
+		query += `o.buyer_id = ?`
 		args = append(args, userID)
 	}
+	query += ` ORDER BY o.created_at DESC`
 
 	rows, err := db.Query(query, args...)
 	if err != nil {
@@ -489,11 +519,11 @@ func getOrders(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	var orders []Order
+	var orders []OrderWithProduct
 	for rows.Next() {
-		var o Order
+		var o OrderWithProduct
 		var createdAtStr string
-		err := rows.Scan(&o.ID, &o.BuyerID, &o.ProductID, &o.Quantity, &o.TotalPrice, &o.Status, &createdAtStr)
+		err := rows.Scan(&o.ID, &o.BuyerID, &o.ProductID, &o.Quantity, &o.TotalPrice, &o.Status, &createdAtStr, &o.ProductName, &o.ProductImage, &o.ProductCategory)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

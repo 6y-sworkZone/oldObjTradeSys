@@ -48,28 +48,51 @@ function Orders() {
             </div>
           ) : (
             orders.map((order) => (
-              <div key={order.id} className="card order-card">
-                <div className="order-header">
-                  <span className="order-id">订单 #{order.id}</span>
-                  <span className="order-status">{order.status === 'completed' ? '已完成' : order.status}</span>
-                </div>
-                <div className="order-details">
-                  <div className="order-detail-item">
-                    <strong>商品ID:</strong> {order.product_id}
+              <div key={order.id} className="card order-card" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                <img
+                  src={order.product_image || 'https://picsum.photos/seed/order/100/100'}
+                  alt={order.product_name}
+                  style={{
+                    width: '80px',
+                    height: '80px',
+                    objectFit: 'cover',
+                    borderRadius: '8px'
+                  }}
+                  onError={(e) => {
+                    e.target.src = 'https://picsum.photos/seed/order/100/100';
+                  }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div className="order-header">
+                    <span className="order-id">订单 #{order.id}</span>
+                    <span style={{
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      padding: '4px 12px',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      fontWeight: 'bold'
+                    }}>
+                      {order.product_category}
+                    </span>
+                    <span className="order-status">{order.status === 'completed' ? '已完成' : order.status}</span>
                   </div>
-                  <div className="order-detail-item">
-                    <strong>数量:</strong> {order.quantity} 件
-                  </div>
-                  <div className="order-detail-item">
-                    <strong>总价:</strong> ¥{order.total_price.toFixed(2)}
-                  </div>
-                  {user?.role === 'seller' && (
+                  <h3 style={{ margin: '8px 0', color: '#333' }}>{order.product_name}</h3>
+                  <div className="order-details">
                     <div className="order-detail-item">
-                      <strong>买家ID:</strong> {order.buyer_id}
+                      <strong>数量:</strong> {order.quantity} 件
                     </div>
-                  )}
-                  <div className="order-detail-item">
-                    <strong>下单时间:</strong> {formatDate(order.created_at)}
+                    <div className="order-detail-item">
+                      <strong>总价:</strong> ¥{order.total_price.toFixed(2)}
+                    </div>
+                    {user?.role === 'seller' && (
+                      <div className="order-detail-item">
+                        <strong>买家ID:</strong> {order.buyer_id}
+                      </div>
+                    )}
+                    <div className="order-detail-item">
+                      <strong>下单时间:</strong> {formatDate(order.created_at)}
+                    </div>
                   </div>
                 </div>
               </div>
